@@ -40,7 +40,9 @@ Usage:
                                  disjoint subsets of {1 ... 2^w}.
                              4: Fromulation  IV: Complete Exclusive
                                  This formulation combines Formulation I and
-                                 prime multipliers X' and Y'.
+                                 prime multipliers X' and Y'. This formulation
+                                 is supposed to be run with second stage
+                                 disabled.
   -s, --secondstage arg  Type of second stage to solve.
                          Valid values:
                              0: Do not solve second stage problem.
