@@ -1,3 +1,13 @@
+Build:
+  Jerasure and GF-Complete (http://jerasure.org/) are expected to be present in
+  system with headers in /usr/local/include/jerasure/ folder.
+  Gurobi 8.1 (https://www.gurobi.com/) is expected to be present in system in
+  /opt/gurobi/81 folder.
+  A valid Gurobi license has to be binded to Gurobi.
+
+  To build, run
+    ./make
+
 Usage:
   ./run [OPTION...]
   All options have to be provided, except for those that have default value.
@@ -41,3 +51,5 @@ Usage:
   -L, --nofsol arg       Number of solutions to solve the second stage for.
                          (default: 1)
 
+Additional:
+  cxxopt library (https://github.com/jarro2783/cxxopts) is used.
