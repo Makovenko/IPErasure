@@ -1,0 +1,43 @@
+Usage:
+  ./run [OPTION...]
+  All options have to be provided, except for those that have default value.
+
+ General options:
+  -h, --help             Print this help.
+
+ Problem options:
+  -w, --bits arg         Number of bits in a byte.
+                         Valid values are from 1 to 32.
+  -r, --redundant arg    Number of columns in encoding matrix (i.e, number of
+                         bytes added to the message).
+                         Valid values are from 1 to 2^w.
+  -k, --original arg     Number of rows in enconding matrix (i.e, number of
+                         bytes in original message).
+                         Valid values are from 1 to 2^w.
+
+ Solving options:
+  -f, --formulation arg  Type of formulation to use to solver the first stage
+                         problem.
+                         Valid values:
+                             1: Formulation   I: Exclusive.
+                                 In this formulation, every X and Y is assigned
+                                 to a specific row or column.
+                             2: Formulation  II: Binary
+                                 In this formulation, X and Y are represented
+                                 as their binary strings.
+                             3: Formulation III: Combination
+                                 In this formulation, X and Y are assigned as
+                                 disjoint subsets of {1 ... 2^w}.
+                             4: Fromulation  IV: Complete Exclusive
+                                 This formulation combines Formulation I and
+                                 prime multipliers X' and Y'.
+  -s, --secondstage arg  Type of second stage to solve.
+                         Valid values:
+                             0: Do not solve second stage problem.
+                             1: Use prime row/col heuristic.
+                             2: Use branch-and-bound enumeration algorithm.
+                             3: Use integer programming.
+  -t, --timelimit arg    First-stage solver time limit. (default: 600)
+  -L, --nofsol arg       Number of solutions to solve the second stage for.
+                         (default: 1)
+

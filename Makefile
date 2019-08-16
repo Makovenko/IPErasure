@@ -59,7 +59,7 @@ OBJECTS       = main.o \
 		ip.o \
 		parameters.o \
 		fullexclusive.o
-TARGET        = Gurobi
+TARGET        = run
 
 OBJS = $(patsubst %,$(OBJECTS_DIR)/%,$(OBJECTS))
 
