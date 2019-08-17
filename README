@@ -38,11 +38,14 @@ Usage:
                              3: Formulation III: Combination
                                  In this formulation, X and Y are assigned as
                                  disjoint subsets of {1 ... 2^w}.
-                             4: Fromulation  IV: Complete Exclusive
+                             4: Formulation  IV: Complete Exclusive
                                  This formulation combines Formulation I and
                                  prime multipliers X' and Y'. This formulation
                                  is supposed to be run with second stage
                                  disabled.
+                             5: Formulation   V: Complete Combination
+                                 Same as IV, but Combination formulations is
+                                 used instead of Exclusive.
   -s, --secondstage arg  Type of second stage to solve.
                          Valid values:
                              0: Do not solve second stage problem.
