@@ -11,7 +11,7 @@ Dynamic::Dynamic(const Solution& sol):
 void Dynamic::solve()
 {
   Solution incumbent(m_currentSolution);
-  int best = incumbent.cost();
+  int best = m_bound;
   int iteration = 0;
   solve(0, incumbent, best, iteration);
   if (iteration > iterLimit)

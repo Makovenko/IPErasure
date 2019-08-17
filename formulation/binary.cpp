@@ -88,8 +88,8 @@ void Binary::generateUniquenessConstraints() {
 void Binary::generatePriceConstraints() {
   for (int i = 0; i < m_currentSolution.cols; ++i) {
     for (int j = 0; j < m_currentSolution.rows; ++j) {
-      for (int p = 0; p < maxInt(); ++p) {
-        for (int d = 0; d < maxInt(); ++d) {
+      for (int p = 0; p < m_currentSolution.maxInt; ++p) {
+        for (int d = 0; d < m_currentSolution.maxInt; ++d) {
           GRBLinExpr sum;
           for (int t = 0; t < m_currentSolution.bits; ++t) {
             sum += (m_X[i][t] + bin(p, t) - 2*m_X[i][t]*bin(p, t)) + (

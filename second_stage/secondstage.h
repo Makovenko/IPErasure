@@ -7,6 +7,7 @@ class SecondStage
 {
 protected:
   Solution m_currentSolution;
+  int m_bound;
 
 public:
   enum class SecondStageType {None, Descent, Dynamic, IP};
@@ -17,6 +18,7 @@ public:
 
   static SecondStageType TypeFromParameters(const Parameters& P);
   static std::unique_ptr<SecondStage> create(SecondStageType T, const Solution& sol);
+  void setBound(int bound);
 };
 
 #endif // SECONDSTAGE_H

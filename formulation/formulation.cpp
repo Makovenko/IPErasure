@@ -3,6 +3,7 @@
 #include "formulation/exclusive.h"
 #include "formulation/combination.h"
 #include "formulation/fullexclusive.h"
+#include "formulation/fullcombination.h"
 
 Formulation::Formulation(const Solution &sol):
   m_currentSolution(sol)
@@ -26,6 +27,8 @@ Formulation::FormulationType Formulation::TypeFromParameters(const Parameters &P
       return FormulationType::Combination;
     case 4:
       return FormulationType::FullExclusive;
+    case 5:
+      return FormulationType::FullCombination;
   }
   return FormulationType::Combination;
 }
@@ -76,6 +79,8 @@ std::unique_ptr<Formulation> Formulation::create(Formulation::FormulationType T,
       return std::make_unique<Combination>(S);
     case FormulationType::FullExclusive:
       return std::make_unique<FullExclusive>(S);
+    case FormulationType::FullCombination:
+      return std::make_unique<FullCombination>(S);
   }
   return std::make_unique<Combination>(S);
 }

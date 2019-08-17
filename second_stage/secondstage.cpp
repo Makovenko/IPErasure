@@ -2,11 +2,17 @@
 #include "second_stage/descent.h"
 #include "second_stage/dynamic.h"
 #include "second_stage/ip.h"
+#include <limits>
+
+void SecondStage::setBound(int bound)
+{
+  m_bound = bound;
+}
 
 SecondStage::SecondStage(const Solution &sol):
   m_currentSolution(sol)
 {
-
+  m_bound = std::numeric_limits<int>::max();
 }
 
 Solution SecondStage::solution() const

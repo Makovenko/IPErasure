@@ -17,7 +17,9 @@ protected:
 
 public:
   enum class SearchMode {Single, Multiple};
-  enum class FormulationType {Binary, Exclusive, Combination, FullExclusive};
+  enum class FormulationType {
+    Binary, Exclusive, Combination, FullExclusive, FullCombination
+  };
 
   Formulation(const Solution& sol);
   void setSearchMode(SearchMode mode);

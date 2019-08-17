@@ -13,7 +13,8 @@ std::vector<Solution> first_stage(const Parameters& P) {
     solver->setSearchMode(Formulation::SearchMode::Multiple);
     solver->setNumberOfSolutions(P.L);
     solver->setTimeLimit(P.timelimit);
-    solver->setSearchMode(Formulation::SearchMode::Single);
+    if (P.L == 1)
+      solver->setSearchMode(Formulation::SearchMode::Single);
     solver->solve();
     return solver->allSolutions();
   } catch (GRBException exc) {
@@ -22,10 +23,11 @@ std::vector<Solution> first_stage(const Parameters& P) {
   }
 }
 
-Solution second_stage(Solution sol, const Parameters &P) {
+Solution second_stage(Solution sol, const Parameters &P, int best) {
   std::cerr<<"Running the second stage."<<std::endl;
   std::cerr<<"Objective value before second stage: "<<sol.cost()<<std::endl;
   auto solver = SecondStage::create(SecondStage::TypeFromParameters(P), sol);
+  solver->setBound(best);
   solver->solve();
   return solver->solution();
 }
@@ -36,7 +38,7 @@ int main(int argc, char** argv) {
   auto fsol = first_stage(P);
   std::cerr<<fsol[0]<<std::endl;
   for (auto& sol: fsol) {
-    auto ssol = second_stage(sol, P);
+    auto ssol = second_stage(sol, P, best.cost());
     if (ssol.cost() < best.cost()) {
       best = ssol;
       std::cerr<<"New best solution value: "<<best.cost()<<std::endl;
