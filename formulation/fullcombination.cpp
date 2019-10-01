@@ -57,7 +57,7 @@ void FullCombination::generatePiVariables() {
   for (auto& el: m_Pi)
     for (int q = 0; q < m_currentSolution.maxInt; ++q)
       el.push_back(m_solver().addVar(
-        0, std::numeric_limits<double>::max(),
+        0.0, std::numeric_limits<double>::max(),
         1.0, GRB_CONTINUOUS
       ));
 }
@@ -86,8 +86,10 @@ void FullCombination::generateUniquenessConstraints()
 
 void FullCombination::generatePriceConstraints()
 {
+  GRBLinExpr sum(0.0);
   for (int l = 0; l < m_currentSolution.maxInt; ++l) {
     for (int q = 0; q < m_currentSolution.maxInt; ++q) {
+      sum += m_Pi[l][q];
       for (int p = 0; p < m_currentSolution.maxInt; ++p) {
         for (int d = 0; d < m_currentSolution.maxInt; ++d) {
           m_solver().addConstr(
@@ -98,4 +100,8 @@ void FullCombination::generatePriceConstraints()
       }
     }
   }
+  m_solver().addConstr(
+    sum, GRB_GREATER_EQUAL,
+    m_currentSolution.bits*m_currentSolution.cols*m_currentSolution.rows
+  );
 }

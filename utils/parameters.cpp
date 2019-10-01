@@ -7,7 +7,7 @@ void Parameters::parseResult(const cxxopts::ParseResult& result)
     exit(0);
   }
   auto required = std::vector<std::string> {
-    "bits", "redundant", "original", "formulation", "secondstage"
+    "bits", "redundant", "original", "formulation"
   };
   for (auto parameter: required)
     if (!result.count(parameter)) {
@@ -22,6 +22,7 @@ void Parameters::parseResult(const cxxopts::ParseResult& result)
   secondstage = result["secondstage"].as<int>();
   timelimit = result["timelimit"].as<int>();
   L = result["nofsol"].as<int>();
+  delta = result["delta"].as<int>();
 
   if (c+r > (1<<w)) {
     std::cerr<<"Not enough distinct finite field elements (original + redundant > 2^bits)."<<std::endl;
@@ -46,10 +47,11 @@ Parameters::Parameters(int argc, char** argv):
     ("k,original", "Number of rows in enconding matrix (i.e, number of bytes in original message).", cxxopts::value<int>())
   ;
   options.add_options("Solving")
-    ("f,formulation", "Type of formulation to use to solver the first stage problem.", cxxopts::value<int>())
-    ("s,secondstage", "Type of second stage to solve.", cxxopts::value<int>())
+    ("f,formulation", "Type of algorithm (first stage) to solve.", cxxopts::value<int>())
+    ("s,secondstage", "Type of second stage to solve.", cxxopts::value<int>()->default_value("0"))
     ("t,timelimit", "First-stage solver time limit.", cxxopts::value<int>()->default_value("600"))
     ("L,nofsol", "Number of solutions to solve the second stage for.", cxxopts::value<int>()->default_value("1"))
+    ("d,delta", "delta value for Branch and Bound algorithm", cxxopts::value<int>()->default_value("0"))
   ;
   try {
     parseResult(options.parse(argc, argv));

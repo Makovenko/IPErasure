@@ -1,8 +1,8 @@
-#include "fullexclusive.h"
-#include <numeric>
+#include "inverseexclusive.h"
 #include "utils/galois_stuff.h"
+#include <numeric>
 
-FullExclusive::FullExclusive(const Solution& sol):
+InverseExclusive::InverseExclusive(const Solution& sol):
   Formulation(sol)
 {
   generateRowColVariables();
@@ -15,9 +15,10 @@ FullExclusive::FullExclusive(const Solution& sol):
   generateCellConstraints();
   generatePrimeCellConstraints();
   generatePriceConstraints();
+  generateInverseConstraints();
 }
 
-void FullExclusive::generateRowColVariables()
+void InverseExclusive::generateRowColVariables()
 {
   row.resize(m_currentSolution.rows);
   for (auto& el: row)
@@ -29,7 +30,7 @@ void FullExclusive::generateRowColVariables()
       el.push_back(m_solver().addVar(0, 1, 0, GRB_BINARY));
 }
 
-void FullExclusive::generatePrimeRowColVariables()
+void InverseExclusive::generatePrimeRowColVariables()
 {
   primeRow.resize(m_currentSolution.rows);
   for (auto& el: primeRow)
@@ -41,7 +42,7 @@ void FullExclusive::generatePrimeRowColVariables()
       el.push_back(m_solver().addVar(0, 1, 0, GRB_BINARY));
 }
 
-void FullExclusive::generateCellVariables()
+void InverseExclusive::generateCellVariables()
 {
   cell.resize(m_currentSolution.cols, VarMatrix(m_currentSolution.rows));
   for (auto& row: cell)
@@ -50,7 +51,7 @@ void FullExclusive::generateCellVariables()
         el.push_back(m_solver().addVar(0, 1, 0, GRB_BINARY));
 }
 
-void FullExclusive::generatePrimeCellVariables()
+void InverseExclusive::generatePrimeCellVariables()
 {
   primeCell.resize(m_currentSolution.cols, VarMatrix(m_currentSolution.rows));
   for (auto& row: primeCell)
@@ -59,7 +60,7 @@ void FullExclusive::generatePrimeCellVariables()
         el.push_back(m_solver().addVar(0, 1, 0, GRB_BINARY));
 }
 
-void FullExclusive::generatePriceVariables()
+void InverseExclusive::generatePriceVariables()
 {
   price.resize(m_currentSolution.cols);
   for (auto& el: price)
@@ -70,7 +71,7 @@ void FullExclusive::generatePriceVariables()
       ));
 }
 
-void FullExclusive::generateUniquenessConstraints()
+void InverseExclusive::generateUniquenessConstraints()
 {
   // Every x must be assigned
   for (auto& el: row) {
@@ -95,7 +96,7 @@ void FullExclusive::generateUniquenessConstraints()
   }
 }
 
-void FullExclusive::generatePrimeRowColConstraints()
+void InverseExclusive::generatePrimeRowColConstraints()
 {
   // Every prime x must be assigned
   for (auto& el: primeRow) {
@@ -113,13 +114,13 @@ void FullExclusive::generatePrimeRowColConstraints()
   }
 }
 
-void FullExclusive::generateCellConstraints()
+void InverseExclusive::generateCellConstraints()
 {
   for (int p = 0; p < m_currentSolution.maxInt; ++p) {
     for (int d = 0; d < m_currentSolution.maxInt; ++d) {
       int sum = galois_sum(p, d);
       for (int i = 0; i < m_currentSolution.cols; ++i) {
-        for (int j = 0; j < m_currentSolution.rows; ++j) {
+        for (int j = 1; j < m_currentSolution.rows; ++j) {
           m_solver().addConstr(
             cell[i][j][sum], GRB_GREATER_EQUAL, col[i][p]+row[j][d] - 1
           );
@@ -129,13 +130,13 @@ void FullExclusive::generateCellConstraints()
   }
 }
 
-void FullExclusive::generatePrimeCellConstraints()
+void InverseExclusive::generatePrimeCellConstraints()
 {
   for (int p = 0; p < m_currentSolution.maxInt; ++p) {
     for (int d = 0; d < m_currentSolution.maxInt; ++d) {
       int product = galois_multiply(p, d, m_currentSolution.bits);
       for (int i = 0; i < m_currentSolution.cols; ++i) {
-        for (int j = 0; j < m_currentSolution.rows; ++j) {
+        for (int j = 1; j < m_currentSolution.rows; ++j) {
           m_solver().addConstr(
             primeCell[i][j][product], GRB_GREATER_EQUAL,
             primeCol[i][p] + primeRow[j][d] - 1
@@ -146,13 +147,13 @@ void FullExclusive::generatePrimeCellConstraints()
   }
 }
 
-void FullExclusive::generatePriceConstraints()
+void InverseExclusive::generatePriceConstraints()
 {
   for (int p = 0; p < m_currentSolution.maxInt; ++p) {
     for (int d = 0; d < m_currentSolution.maxInt; ++d) {
       int c = get_cij_product(p, d, m_currentSolution.bits);
       for (int i = 0; i < m_currentSolution.cols; ++i) {
-        for (int j = 0; j < m_currentSolution.rows; ++j) {
+        for (int j = 1; j < m_currentSolution.rows; ++j) {
           m_solver().addConstr(
             price[i][j], GRB_GREATER_EQUAL,
             (primeCell[i][j][p] + cell[i][j][d] - 1)*c
@@ -161,17 +162,28 @@ void FullExclusive::generatePriceConstraints()
       }
     }
   }
-
-  for (int i = 1; i < m_currentSolution.cols; ++i) {
-    m_solver().addConstr(
-      std::accumulate(price[i].begin(), price[i].end(), GRBLinExpr(0.0)),
-      GRB_LESS_EQUAL,
-      std::accumulate(price[i-1].begin(), price[i-1].end(), GRBLinExpr(0.0))
-    );
-  }
 }
 
-Solution FullExclusive::nextSolution()
+void InverseExclusive::generateInverseConstraints()
+{
+  std::cerr<<"Generating inverse constraints..."<<std::endl;
+  m_solver().addConstr(primeRow[0][1], GRB_EQUAL, 1.0);
+
+  for (int p = 0; p < m_currentSolution.maxInt; ++p) {
+    for (int d = 0; d < m_currentSolution.maxInt; ++d) {
+      int inverse = galois_suminverse(p, d, m_currentSolution.bits);
+      if (inverse <= 0) continue;
+      for (int c = 0; c < m_currentSolution.cols; ++c) {
+        m_solver().addConstr(
+          primeCol[c][inverse], GRB_GREATER_EQUAL, col[c][p] + row[0][d] - 1
+        );
+      }
+    }
+  }
+  std::cerr<<"Done"<<std::endl;
+}
+
+Solution InverseExclusive::nextSolution()
 {
   static int currentSolution = 0;
   int solutions = m_solver().get(GRB_IntParam_SolutionNumber);

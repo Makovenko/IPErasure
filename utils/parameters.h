@@ -10,6 +10,7 @@ class Parameters
 
 public:
   int r, c, w, L, firststage, secondstage, timelimit;
+  int delta;
   Parameters(int argc, char** argv);
 };
 

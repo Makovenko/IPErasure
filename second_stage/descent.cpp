@@ -33,9 +33,9 @@ void Descent::optimizeDown()
     }
     newValue += best;
   }
-  std::cout<<"Optimized the matrix downwards. New value is "<<newValue<<", while old was "<<oldValue<<". ";
+  std::cerr<<"Optimized the matrix downwards. New value is "<<newValue<<", while old was "<<oldValue<<". ";
   if (newValue < oldValue) {
-    std::cout<<"Going to optimize rightwards."<<std::endl;
+    std::cerr<<"Going to optimize rightwards."<<std::endl;
     optimizeRight();
   }
 }

@@ -17,6 +17,8 @@ struct Solution {
   Solution(const Parameters& P);
   Solution& operator=(const Solution& other);
 
+  bool isUsedInRow(int value, int toCol = 0);
+
   int matrix(const int row, const int col) const;
   int cost(const int row, const int col) const;
   int cost() const;

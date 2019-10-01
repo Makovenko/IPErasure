@@ -22,6 +22,12 @@ Solution &Solution::operator=(const Solution &other)
   return *this;
 }
 
+bool Solution::isUsedInRow(int value, int toCol)
+{
+  if (!toCol) toCol = cols;
+  return std::find(encodersRow.begin(), encodersRow.begin()+toCol, value) != (encodersRow.begin() + toCol);
+}
+
 int Solution::matrix(const int row, const int col) const {
   return galois_suminverse_extended(encodersRow[row], encodersCol[col], multipliersRow[row], multipliersCol[col], bits);
 }
@@ -37,7 +43,6 @@ int Solution::cost() const {
       ans += cost(r, c);
   return ans;
 }
-
 
 std::ostream &operator<<(std::ostream &out, const Solution &sol)
 {

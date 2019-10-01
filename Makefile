@@ -23,7 +23,8 @@ MKDIR_P       = mkdir -p
 MOVE          = mv -f
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) -lgf_complete -lJerasure -L/opt/gurobi/81/linux64/lib/ -lgurobi_c++ -lgurobi81 
+LIBS          = $(SUBLIBS) -lgf_complete -lJerasure -L/opt/gurobi/81/linux64/lib/ -lgurobi_c++ -lgurobi81
+GRBDIR        = /opt/gurobi/81/linux64
 
 ####### Output directory
 
@@ -39,12 +40,15 @@ SOURCES       = main.cpp \
 		formulation/binary.cpp \
 		formulation/combination.cpp \
 		formulation/fullexclusive.cpp \
+		formulation/inverseexclusive.cpp \
+		formulation/fullcombination.cpp \
 		formulation/formulation.cpp \
 		formulation/exclusive.cpp \
 		second_stage/secondstage.cpp \
 		second_stage/descent.cpp \
 		second_stage/dynamic.cpp \
-		second_stage/ip.cpp 
+		second_stage/ip.cpp \
+		nonip/branchandboundalt.cpp
 OBJECTS       = main.o \
 		solution.o \
 		binary.o \
@@ -58,7 +62,10 @@ OBJECTS       = main.o \
 		dynamic.o \
 		ip.o \
 		parameters.o \
-		fullexclusive.o
+		fullexclusive.o \
+		fullcombination.o \
+		inverseexclusive.o \
+		branchandboundalt.o
 TARGET        = run
 
 OBJS = $(patsubst %,$(OBJECTS_DIR)/%,$(OBJECTS))
@@ -134,7 +141,9 @@ formulation.o: formulation/formulation.cpp formulation/formulation.h \
 		utils/solution.h \
 		utils/parameters.h \
 		utils/cxxopts.hpp \
-		formulation/fullexclusive.h
+		formulation/fullexclusive.h \
+		formulation/inverseexclusive.h \
+		formulation/fullcombination.h
 	$(MKDIR_P) $(OBJECTS_DIR)
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(OBJECTS_DIR)/formulation.o formulation/formulation.cpp
 
@@ -172,8 +181,8 @@ dynamic.o: second_stage/dynamic.cpp second_stage/dynamic.h \
 ip.o: second_stage/ip.cpp second_stage/ip.h \
 		second_stage/secondstage.h \
 		utils/gurobi_stuff.h \
-		/opt/gurobi/81/linux64/include/gurobi_c++.h \
-		/opt/gurobi/81/linux64/include/gurobi_c.h \
+		$(GRBDIR)/include/gurobi_c++.h \
+		$(GRBDIR)/include/gurobi_c.h \
 		utils/galois_stuff.h
 	$(MKDIR_P) $(OBJECTS_DIR)
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(OBJECTS_DIR)/ip.o second_stage/ip.cpp
@@ -185,8 +194,37 @@ parameters.o: utils/parameters.cpp utils/parameters.h \
 
 fullexclusive.o: formulation/fullexclusive.cpp formulation/fullexclusive.h \
 		formulation/formulation.h \
-		/opt/gurobi/81/linux64/include/gurobi_c++.h \
-		/opt/gurobi/81/linux64/include/gurobi_c.h \
+		$(GRBDIR)/include/gurobi_c++.h \
+		$(GRBDIR)/include/gurobi_c.h \
 		utils/galois_stuff.h
 	$(MKDIR_P) $(OBJECTS_DIR)
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(OBJECTS_DIR)/fullexclusive.o formulation/fullexclusive.cpp
+
+fullcombination.o: formulation/fullcombination.cpp formulation/fullcombination.h \
+		formulation/formulation.h \
+		$(GRBDIR)/include/gurobi_c++.h \
+		$(GRBDIR)/include/gurobi_c.h \
+		utils/gurobi_stuff.h \
+		utils/solution.h \
+		utils/parameters.h \
+		utils/cxxopts.hpp \
+		utils/galois_stuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(OBJECTS_DIR)/fullcombination.o formulation/fullcombination.cpp
+
+inverseexclusive.o: ../Gurobi/formulation/inverseexclusive.cpp ../Gurobi/formulation/inverseexclusive.h \
+		formulation/formulation.h \
+		$(GRBDIR)/include/gurobi_c++.h \
+		$(GRBDIR)/include/gurobi_c.h \
+		utils/gurobi_stuff.h \
+		utils/solution.h \
+		utils/parameters.h \
+		utils/cxxopts.hpp \
+		utils/galois_stuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(OBJECTS_DIR)/inverseexclusive.o formulation/inverseexclusive.cpp
+
+branchandboundalt.o: ../Gurobi/nonip/branchandboundalt.cpp ../Gurobi/nonip/branchandboundalt.h \
+		utils/solution.h \
+		utils/parameters.h \
+		utils/cxxopts.hpp \
+		utils/galois_stuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $(OBJECTS_DIR)/branchandboundalt.o nonip/branchandboundalt.cpp
