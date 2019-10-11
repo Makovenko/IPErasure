@@ -10,6 +10,17 @@ Solution::Solution(const Parameters &P): rows(P.r), cols(P.c), bits(P.w), maxInt
   for (int i = 0; i < cols; ++i) encodersCol[i] = rows+i;
 }
 
+Solution::Solution(const int k, const int r, const int w):
+    rows(r), cols(k), bits(w), maxInt(1<<bits)
+{
+  multipliersRow.resize(rows, 1);
+  multipliersCol.resize(cols, 1);
+  encodersRow.resize(rows, 1);
+  encodersCol.resize(cols, 1);
+  for (int i = 0; i < rows; ++i) encodersRow[i] = i;
+  for (int i = 0; i < cols; ++i) encodersCol[i] = rows+i;
+}
+
 Solution &Solution::operator=(const Solution &other)
 {
   if (rows != other.rows || cols != other.cols || bits != other.bits) {
@@ -47,10 +58,12 @@ int Solution::cost() const {
 std::ostream &operator<<(std::ostream &out, const Solution &sol)
 {
   out<<"Row: ";
-  for (int r = 0; r < sol.rows; ++r)
+  for (int r = 0; r < sol.rows-1; ++r)
     out<<"("<<sol.encodersRow[r]<<", "<<sol.multipliersRow[r]<<"), ";
+  out<<"("<<sol.encodersRow[sol.rows-1]<<", "<<sol.multipliersRow[sol.rows-1]<<")";
   out<<std::endl<<"Col: ";
-  for (int c = 0; c < sol.cols; ++c)
+  for (int c = 0; c < sol.cols-1; ++c)
     out<<"("<<sol.encodersCol[c]<<", "<<sol.multipliersCol[c]<<"), ";
+  out<<"("<<sol.encodersCol[sol.cols-1]<<", "<<sol.multipliersCol[sol.cols-1]<<")";
   return out;
 }

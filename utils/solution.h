@@ -15,6 +15,7 @@ struct Solution {
   const int maxInt;
 
   Solution(const Parameters& P);
+  Solution(const int k, const int r, const int w);
   Solution& operator=(const Solution& other);
 
   bool isUsedInRow(int value, int toCol = 0);

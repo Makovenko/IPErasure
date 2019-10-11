@@ -7,9 +7,11 @@ class BranchAndBoundAlt
 private:
   int m_bestCost;
   int m_delta;
+  std::vector<int> m_present;
   Solution m_currentSolution;
   Solution m_incumbentSolution;
 
+  int findBound(int r, int k, int w);
   int findOptimalColumn(int toCol);
 
   int solveEncoder(int col);
